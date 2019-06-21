@@ -1,0 +1,15 @@
+Package: mixup
+Title: Create Convex Combinations of Pairs of Examples and their Labels for Data Augmentation
+Version: 0.0.1
+Authors@R: person("makeyourownmaker", email = "makeyourownmaker@gmx.com", role = c("aut", "cre"))
+Author: makeyourownmaker [aut, cre]
+Maintainer: makeyourownmaker <makeyourownmaker@gmx.com>
+BugReports: https://github.com/makeyourownmaker/mixup/issues
+Description: The mixup method enlarges training sets using linear interpolations of features and associated labels as described in https://arxiv.org/abs/1710.09412.  It produces virtual feature-target pairs from randomly drawn feature-target pairs in the training data.  The strength of interpolation is governed by a mixup hyperparameter.  The method is straight-forward and data-agnostic.  It should result in a reduction of generalisation error and may help to resist memorisation of corrupt labels.
+Depends: R (>= 3.2.0)
+License: GPL-2 | file LICENSE
+URL: https://github.com/makeyourownmaker/mixup
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat
+RoxygenNote: 6.1.0.9000

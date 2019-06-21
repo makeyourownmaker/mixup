@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+proj$
+^\.Rproj\.user$
+^\.travis\.yml$
