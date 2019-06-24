@@ -60,6 +60,7 @@ result in a reduction of generalisation error.
 Mixup constructs additional training examples:
 
 x' = λ * x_i + (1 - λ) * x_j, where x_i, x_j are raw input vectors
+
 y' = λ * y_i + (1 - λ) * y_j, where y_i, y_j are one-hot label encodings
 
 (x_i, y_i) and (x_j ,y_j) are two examples drawn at random from the training 
