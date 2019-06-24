@@ -45,13 +45,14 @@ The mixup function returns a two-element list containing interpolated x
 and y values.  Optionally, the original values can be concatenated with the
 new values.
 
-\eqn{x' = \lambda * x_i + (1 - \lambda) * x_j, \textrm{where} x_i, x_j} are raw input vectors
+\eqn{x' = \lambda * x_i + (1 - \lambda) * x_j}, where \eqn{x_i, x_j} are raw input vectors
 
-\eqn{y' = \lambda * y_i + (1 - \lambda) * y_j, \textrm{where} y_i, y_j} are one-hot label encodings
+\eqn{y' = \lambda * y_i + (1 - \lambda) * y_j}, where \eqn{y_i, y_j} are one-hot label encodings
 
 \eqn{(x_i, y_i)} and \eqn{(x_j ,y_j)} are two examples drawn at random from the training 
-data, and \eqn{\lambda \in [0, 1]} with \eqn{\lambda ∼ \textrm{Beta}(\alpha, \alpha)} for \eqn{\alpha \in (0, \infty)}.
-The mixup hyper-parameter α controls the strength of interpolation between 
+data, and \eqn{\lambda \in [0, 1]} with \eqn{\lambda \sim Beta(\alpha, \alpha)} for 
+\eqn{\alpha \in (0, \infty)}.
+The mixup hyper-parameter \eqn{\alpha} controls the strength of interpolation between 
 feature-target pairs.
 }
 \examples{
