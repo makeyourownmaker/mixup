@@ -28,6 +28,8 @@
 #' @return A list containing interpolated x and y values and optionally the original values
 #' @export
 #' @examples
+#' # Use builtin mtcars dataset with mtcars$am (automatic/manual) as binary target
+#' data(mtcars)
 #' mtcars.mix <- mixup(mtcars[, -9], mtcars$am)
 mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
   # TODO Check alpha & batch_size are not -ve
@@ -186,6 +188,9 @@ mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
 
 #' mixup: Create Convex Combinations of Pairs of Examples and their Labels for Data Augmentation
 #'
+#' An R package inspired by mixup: Beyond Empirical Risk Minimization
+#'
+#' @section Interpolation:
 #' This package enlarges training sets using linear interpolations 
 #' of features and associated labels: 
 #' 

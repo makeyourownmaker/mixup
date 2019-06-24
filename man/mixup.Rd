@@ -27,8 +27,7 @@ This function enlarges training sets using linear interpolations
 of features and associated labels as described in 
 https://arxiv.org/abs/1710.09412.
 
-This package enlarges training sets using linear interpolations 
-of features and associated labels:
+An R package inspired by mixup: Beyond Empirical Risk Minimization
 }
 \details{
 The x1 and y1 parameters must be numeric and must have equal 
@@ -44,6 +43,11 @@ specifies no interpolation.
 The mixup function returns a two-element list containing interpolated x 
 and y values.  Optionally, the original values can be concatenated with the
 new values.
+}
+\section{Interpolation}{
+
+This package enlarges training sets using linear interpolations 
+of features and associated labels: 
 
 \eqn{x' = \lambda * x_i + (1 - \lambda) * x_j}, where \eqn{x_i, x_j} are raw input vectors
 
@@ -55,6 +59,9 @@ data, and \eqn{\lambda \in [0, 1]} with \eqn{\lambda \sim Beta(\alpha, \alpha)} 
 The mixup hyper-parameter \eqn{\alpha} controls the strength of interpolation between 
 feature-target pairs.
 }
+
 \examples{
+# Use builtin mtcars dataset with mtcars$am (automatic/manual) as binary target
+data(mtcars)
 mtcars.mix <- mixup(mtcars[, -9], mtcars$am)
 }
