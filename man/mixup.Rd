@@ -27,21 +27,9 @@ This function enlarges training sets using linear interpolations
 of features and associated labels as described in 
 https://arxiv.org/abs/1710.09412.
 
-The mixup method enlarges training sets using linear interpolations of 
-features and associated labels as described in 
-https://arxiv.org/abs/1710.09412.  It produces virtual feature-target 
-pairs from randomly drawn feature-target pairs in the training data.  
-The strength of interpolation is governed by a mixup hyperparameter.  
-The method is straight-forward and data-agnostic.  It should result in 
-a reduction of generalisation error.
+Mixup constructs additional training examples:
 }
 \details{
-Virtual feature-target pairs are produced from randomly drawn 
-feature-target pairs in the training data.  The strength of 
-interpolation is governed by a mixup hyperparameter, alpha.
-The method is straight-forward and data-agnostic.  It should 
-result in a reduction of generalisation error.
-
 The x1 and y1 parameters must be numeric and must have equal 
 numbers of examples.  Non-finite values are not permitted.
 Factors should be one-hot encoded.
@@ -56,13 +44,11 @@ The mixup function returns a two-element list containing interpolated x
 and y values.  Optionally, the original values can be concatenated with the
 new values.
 
-Mixup constructs additional training examples:
+\eqn{x' = \lambda * x_i + (1 - \lambda) * x_j, \textrm{where} x_i, x_j} are raw input vectors
+\eqn{y' = \lambda * y_i + (1 - \lambda) * y_j, \textrm{where} y_i, y_j} are one-hot label encodings
 
-x' = λ * x_i + (1 - λ) * x_j, where x_i, x_j are raw input vectors
-y' = λ * y_i + (1 - λ) * y_j, where y_i, y_j are one-hot label encodings
-
-(x_i, y_i) and (x_j ,y_j) are two examples drawn at random from the training 
-data, and λ ∈ [0, 1] with λ ∼ Beta(α, α) for α ∈ (0, ∞).
+\eqn{(x_i, y_i)} and \eqn{(x_j ,y_j)} are two examples drawn at random from the training 
+data, and \eqn{\lambda \in [0, 1]} with \eqn{\lambda ∼ \textrm{Beta}(\alpha, \alpha)} for \eqn{\alpha \in (0, \infty)}.
 The mixup hyper-parameter α controls the strength of interpolation between 
 feature-target pairs.
 }
