@@ -27,7 +27,8 @@ This function enlarges training sets using linear interpolations
 of features and associated labels as described in 
 https://arxiv.org/abs/1710.09412.
 
-Mixup constructs additional training examples:
+This package enlarges training sets using linear interpolations 
+of features and associated labels:
 }
 \details{
 The x1 and y1 parameters must be numeric and must have equal 
@@ -45,6 +46,7 @@ and y values.  Optionally, the original values can be concatenated with the
 new values.
 
 \eqn{x' = \lambda * x_i + (1 - \lambda) * x_j, \textrm{where} x_i, x_j} are raw input vectors
+
 \eqn{y' = \lambda * y_i + (1 - \lambda) * y_j, \textrm{where} y_i, y_j} are one-hot label encodings
 
 \eqn{(x_i, y_i)} and \eqn{(x_j ,y_j)} are two examples drawn at random from the training 
