@@ -8,8 +8,64 @@
 \usage{
 mixup(x1, y1, alpha = 1, concat = FALSE, batch_size = NULL)
 }
-\description{
-mixup Function
+\arguments{
+\item{x1}{Original features}
 
-mixup: Create Convex Combinations of Pairs of Examples and their Labels for Data Augmentation
+\item{y1}{Original labels}
+
+\item{alpha}{Hyperparameter specifying strength of interpolation}
+
+\item{concat}{Concatenate mixup data with original}
+
+\item{batch_size}{How many mixup values to produce}
+}
+\value{
+A list containing interpolated x and y values and optionally the original values
+}
+\description{
+This function enlarges training sets using linear interpolations 
+of features and associated labels as described in 
+https://arxiv.org/abs/1710.09412.
+
+The mixup method enlarges training sets using linear interpolations of 
+features and associated labels as described in 
+https://arxiv.org/abs/1710.09412.  It produces virtual feature-target 
+pairs from randomly drawn feature-target pairs in the training data.  
+The strength of interpolation is governed by a mixup hyperparameter.  
+The method is straight-forward and data-agnostic.  It should result in 
+a reduction of generalisation error.
+}
+\details{
+Virtual feature-target pairs are produced from randomly drawn 
+feature-target pairs in the training data.  The strength of 
+interpolation is governed by a mixup hyperparameter, alpha.
+The method is straight-forward and data-agnostic.  It should 
+result in a reduction of generalisation error.
+
+The x1 and y1 parameters must be numeric and must have equal 
+numbers of examples.  Non-finite values are not permitted.
+Factors should be one-hot encoded.
+
+For now, only binary classification is supported.  Meaning y1 must contain 
+only numeric 0 and 1 values.
+
+Alpha values must be greater than or equal to zero.  Alpha equal to zero
+specifies no interpolation.
+
+The mixup function returns a two-element list containing interpolated x 
+and y values.  Optionally, the original values can be concatenated with the
+new values.
+
+Mixup constructs additional training examples:
+
+x' = λ * x_i + (1 - λ) * x_j, where x_i, x_j are raw input vectors
+y' = λ * y_i + (1 - λ) * y_j, where y_i, y_j are one-hot label encodings
+
+(x_i, y_i) and (x_j ,y_j) are two examples drawn at random from the training 
+data, and λ ∈ [0, 1] with λ ∼ Beta(α, α) for α ∈ (0, ∞).
+The mixup hyper-parameter α controls the strength of interpolation between 
+feature-target pairs.
+}
+\examples{
+mtcars.mix <- mixup(mtcars[, -9], mtcars$am)
 }
