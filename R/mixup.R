@@ -186,9 +186,11 @@ mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
 
 #' mixup: Create Convex Combinations of Pairs of Examples and their Labels for Data Augmentation
 #'
-#' Mixup constructs additional training examples:
+#' This package enlarges training sets using linear interpolations 
+#' of features and associated labels: 
 #' 
 #' \eqn{x' = \lambda * x_i + (1 - \lambda) * x_j, \textrm{where} x_i, x_j} are raw input vectors
+#' 
 #' \eqn{y' = \lambda * y_i + (1 - \lambda) * y_j, \textrm{where} y_i, y_j} are one-hot label encodings
 #' 
 #' \eqn{(x_i, y_i)} and \eqn{(x_j ,y_j)} are two examples drawn at random from the training 
