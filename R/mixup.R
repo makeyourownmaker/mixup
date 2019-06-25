@@ -1,4 +1,109 @@
 
+check_params <- function(x1, y1, alpha, concat, batch_size) {
+
+  if ( !is.vector(x1) & !is.data.frame(x1) & !is.matrix(x1) ) {
+    errmsg <- paste0("'x1' must be vector, data.frame or matrix:\n",
+                     "  'x1' is ", class(x1), "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( !is.vector(y1) & !is.data.frame(y1) & !is.matrix(y1) ) {
+    errmsg <- paste0("'y1' must be vector, data.frame or matrix:\n",
+                     "  'y1' is ", class(y1), "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  x1.len <- get_data_length(x1)
+  y1.len <- get_data_length(y1)
+
+  if ( x1.len != y1.len ) {
+    errmsg <- paste0("'x1' and 'y1' must have compatible lengths:\n",
+                     "  'x1' has length: ", x1.len, "\n",
+                     "  'y1' has length: ", y1.len, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( any(is.na(x1)) ) {
+    # TODO print NAs, Inf, NaN found at n locations: ...
+    errmsg <- paste0("Can't have missing values in 'x1'.\n",
+                     "  NAs found at ", sum(is.na(x1)), " locations.\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( any(is.na(y1)) ) {
+    # TODO print NAs, Inf, NaN found at n locations: ...
+    errmsg <- paste0("Can't have missing values in 'y1'.\n",
+                     "  NAs found at ", sum(is.na(y1)), " locations.\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( alpha < 0 ) {
+    errmsg <- paste0("'alpha' must be greater than or equal to 0.\n",
+                     "  'alpha' is ", alpha, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( !is.null(batch_size) && batch_size <= 0 ) {
+    errmsg <- paste0("'batch_size' must be greater than 0.\n",
+                     "  'batch_size' is ", batch_size, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( concat != TRUE & concat != FALSE ) {
+    errmsg <- paste0("'concat' must be TRUE or FALSE:\n",
+                     "  'concat' is ", concat, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  # Check x1, y1 are all numeric
+  x1_num <- is_data_all_numeric(x1)
+  y1_num <- is_data_all_numeric(y1)
+
+  if ( x1_num == FALSE | y1_num == FALSE ) {
+    errmsg <- "'x1' and 'y1' must be entirely numeric:\n"
+
+    if ( y1_num == FALSE & is.vector(y1) ) {
+      errmsg <- paste0(errmsg, "  'y1' is ", class(y1), "\n")
+    }
+
+    if ( x1_num == FALSE & is.vector(x1) ) {
+      errmsg <- paste0(errmsg, "  'x1' is ", class(x1), "\n")
+    }
+    else {
+      errmsg <- paste0(errmsg, 
+                       "  'x1' has ", 
+                       sum(sapply(x1, function(x) is.numeric(x)) == FALSE), 
+                       "non-numeric columns\n") 
+    }
+
+    stop(errmsg, call. = FALSE)
+  }
+
+  return(0)
+}
+
+
+is_data_all_numeric <- function(data) {
+  if ( is.vector(data) ) {
+    num_or_not <- is.numeric(data)
+  } else if ( is.data.frame(data) | is.matrix(data) ) {
+    num_or_not <- all(sapply(data, function(x) is.numeric(x)))
+  }
+
+  return(num_or_not)
+}
+
+
+get_data_length <- function(data) {
+  if ( is.vector(data) ) {
+    len <- length(data)
+  } else if ( is.data.frame(data) | is.matrix(data) ) {
+    len <- nrow(data)
+  }
+
+  return(len)
+}
+
 
 #' mixup Function
 #'
@@ -32,49 +137,14 @@
 #' data(mtcars)
 #' mtcars.mix <- mixup(mtcars[, -9], mtcars$am)
 mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
-  # TODO Check alpha & batch_size are not -ve
-  #      Check concat is TRUE or FALSE
-  #      Check neither x1 or y1 are missing
 
-  if (any(is.na(x1))) {
-    # TODO print NAs, Inf, NaN found at n locations: ...
-    errmsg <- paste0("Can't have missing values in 'x1'.\n",
-                     "  NAs found at ", sum(is.na(x1)), " locations.\n")
-    stop(errmsg, call. = FALSE)
-  }
+  check_params(x1, y1, alpha, concat, batch_size)
 
-  if (any(is.na(y1))) {
-    # TODO print NAs, Inf, NaN found at n locations: ...
-    errmsg <- paste0("Can't have missing values in 'y1'.\n",
-                     "  NAs found at ", sum(is.na(y1)), " locations.\n")
-    stop(errmsg, call. = FALSE)
-  }
+  x1.len <- get_data_length(x1)
+  y1.len <- get_data_length(y1)
 
   if (is.null(batch_size)) {
-    if (is.vector(x1)) {
-      batch_size <- length(x1)
-    } else if (is.data.frame(x1) | is.matrix(x1)) {
-      batch_size <- nrow(x1)
-    }
-  }
-
-  if (is.vector(x1)) {
-    x1.len <- length(x1)
-  } else if (is.data.frame(x1) | is.matrix(x1)) {
-    x1.len <- nrow(x1)
-  }
-
-  if (is.vector(y1)) {
-    y1.len <- length(y1)
-  } else if (is.data.frame(y1) | is.matrix(y1)) {
-    y1.len <- nrow(y1)
-  }
-
-  if (x1.len != y1.len) {
-    errmsg <- paste0("Error: 'x1' and 'y1' must have compatible lengths:\n",
-                     "  'x1' has length: ", x1.len, "\n",
-                     "  'y1' has length: ", y1.len, "\n")
-    stop(errmsg, call. = FALSE)
+    batch_size <- x1.len
   }
 
   # used to shuffle x1 and y1
@@ -97,7 +167,7 @@ mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
       } else {
         x1 <- x1[rep(seq_len(nrow(x1)), rep.times),]
 
-        # fix errors with single dimenion data frames & matrices
+        # Fixes errors with single dimenion data frames & matrices
         if (is.matrix(x1.orig)) {
             x1 <- as.matrix(x1)
         } else if (is.data.frame(x1.orig)) {
@@ -118,7 +188,7 @@ mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
       } else {
         y1 <- y1[rep(seq_len(nrow(y1)), rep.times),]
 
-        # fix errors with single dimenion data frames & matrices
+        # Fixes errors with single dimenion data frames & matrices
         if (is.matrix(y1.orig)) {
             y1 <- as.matrix(y1)
         } else if (is.data.frame(y1.orig)) {
