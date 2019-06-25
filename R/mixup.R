@@ -1,17 +1,8 @@
 
 check_params <- function(x1, y1, alpha, concat, batch_size) {
 
-  if ( !is.vector(x1) & !is.data.frame(x1) & !is.matrix(x1) ) {
-    errmsg <- paste0("'x1' must be vector, data.frame or matrix:\n",
-                     "  'x1' is ", class(x1), "\n")
-    stop(errmsg, call. = FALSE)
-  }
-
-  if ( !is.vector(y1) & !is.data.frame(y1) & !is.matrix(y1) ) {
-    errmsg <- paste0("'y1' must be vector, data.frame or matrix:\n",
-                     "  'y1' is ", class(y1), "\n")
-    stop(errmsg, call. = FALSE)
-  }
+  is_data_vec_df_mat(x1, 'x1')
+  is_data_vec_df_mat(y1, 'y1')
 
   x1.len <- get_data_length(x1)
   y1.len <- get_data_length(y1)
@@ -23,19 +14,11 @@ check_params <- function(x1, y1, alpha, concat, batch_size) {
     stop(errmsg, call. = FALSE)
   }
 
-  if ( any(is.na(x1)) ) {
-    # TODO print NAs, Inf, NaN found at n locations: ...
-    errmsg <- paste0("Can't have missing values in 'x1'.\n",
-                     "  NAs found at ", sum(is.na(x1)), " locations.\n")
-    stop(errmsg, call. = FALSE)
-  }
+  is_data_all_numeric(x1, 'x1')
+  is_data_all_numeric(y1, 'y1')
 
-  if ( any(is.na(y1)) ) {
-    # TODO print NAs, Inf, NaN found at n locations: ...
-    errmsg <- paste0("Can't have missing values in 'y1'.\n",
-                     "  NAs found at ", sum(is.na(y1)), " locations.\n")
-    stop(errmsg, call. = FALSE)
-  }
+  is_data_finite(x1, 'x1')
+  is_data_finite(y1, 'y1')
 
   if ( alpha < 0 ) {
     errmsg <- paste0("'alpha' must be greater than or equal to 0.\n",
@@ -55,25 +38,47 @@ check_params <- function(x1, y1, alpha, concat, batch_size) {
     stop(errmsg, call. = FALSE)
   }
 
-  # Check x1, y1 are all numeric
-  x1_num <- is_data_all_numeric(x1)
-  y1_num <- is_data_all_numeric(y1)
+  return(0)
+}
 
-  if ( x1_num == FALSE | y1_num == FALSE ) {
-    errmsg <- "'x1' and 'y1' must be entirely numeric:\n"
 
-    if ( y1_num == FALSE & is.vector(y1) ) {
-      errmsg <- paste0(errmsg, "  'y1' is ", class(y1), "\n")
+is_data_vec_df_mat <- function(data, name) {
+  if ( !is.vector(data) & !is.data.frame(data) & !is.matrix(data) ) {
+    errmsg <- paste0("'", name, "' must be vector, data.frame or matrix:\n",
+                     "  '", name, "' is ", class(data), "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  return(0)
+}
+
+
+is_data_finite <- function(data, name) {
+
+  sum_nas  <- sum(is.na(data))
+
+  if ( is.vector(data) ) {
+    sum_nans <- sum(is.nan(data))
+    sum_infs <- sum(is.infinite(data))
+  }
+  else if ( is.data.frame(data) | is.matrix(data) ) {
+    sum_nans <- sum(is.nan(as.matrix(data)))
+    sum_infs <- sum(is.infinite(as.matrix(data)))
+  }
+
+  #if ( any(!is.finite(data)) ) { # Does not work with data.frames :-(
+  #if ( any(is.finite(as.matrix(data))) ) {
+  if ( sum_nas != 0 | sum_nans != 0 | sum_infs != 0 ) {
+    errmsg <- paste0("Can't have non-finite values in '", name, "':\n")
+
+    if ( sum_nas != 0 ) {
+      errmsg <- paste0(errmsg, "  NAs found at ", sum_nas, " locations.\n")
     }
-
-    if ( x1_num == FALSE & is.vector(x1) ) {
-      errmsg <- paste0(errmsg, "  'x1' is ", class(x1), "\n")
+    if ( sum_infs != 0 ) {
+      errmsg <- paste0(errmsg, "  Infs found at ", sum_infs, " locations.\n")
     }
-    else {
-      errmsg <- paste0(errmsg, 
-                       "  'x1' has ", 
-                       sum(sapply(x1, function(x) is.numeric(x)) == FALSE), 
-                       "non-numeric columns\n") 
+    if ( sum_nans != 0 ) {
+      errmsg <- paste0(errmsg, "  NaNs found at ", sum_nans, " locations.\n")
     }
 
     stop(errmsg, call. = FALSE)
@@ -83,14 +88,30 @@ check_params <- function(x1, y1, alpha, concat, batch_size) {
 }
 
 
-is_data_all_numeric <- function(data) {
+is_data_all_numeric <- function(data, name) {
   if ( is.vector(data) ) {
     num_or_not <- is.numeric(data)
   } else if ( is.data.frame(data) | is.matrix(data) ) {
     num_or_not <- all(sapply(data, function(x) is.numeric(x)))
   }
 
-  return(num_or_not)
+  if ( num_or_not == FALSE ) {
+    errmsg <- paste0("'", name, "' must be entirely numeric:\n")
+
+    if ( is.vector(data) ) {
+      errmsg <- paste0(errmsg, "  '", name, "' is ", class(data), "\n")
+    }
+    else {
+      errmsg <- paste0(errmsg, 
+                       "  '", name, "' has ", 
+                       sum(sapply(x1, function(x) is.numeric(x)) == FALSE), 
+                       " non-numeric columns\n") 
+    }
+
+    stop(errmsg, call. = FALSE)
+  }
+
+  return(0)
 }
 
 
