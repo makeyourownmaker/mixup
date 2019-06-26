@@ -1,46 +1,4 @@
 
-check_params <- function(x1, y1, alpha, concat, batch_size) {
-
-  is_data_vec_df_mat(x1, 'x1')
-  is_data_vec_df_mat(y1, 'y1')
-
-  x1.len <- get_data_length(x1)
-  y1.len <- get_data_length(y1)
-
-  if ( x1.len != y1.len ) {
-    errmsg <- paste0("'x1' and 'y1' must have compatible lengths:\n",
-                     "  'x1' has length: ", x1.len, "\n",
-                     "  'y1' has length: ", y1.len, "\n")
-    stop(errmsg, call. = FALSE)
-  }
-
-  is_data_all_numeric(x1, 'x1')
-  is_data_all_numeric(y1, 'y1')
-
-  is_data_finite(x1, 'x1')
-  is_data_finite(y1, 'y1')
-
-  if ( alpha < 0 ) {
-    errmsg <- paste0("'alpha' must be greater than or equal to 0.\n",
-                     "  'alpha' is ", alpha, "\n")
-    stop(errmsg, call. = FALSE)
-  }
-
-  if ( !is.null(batch_size) && batch_size <= 0 ) {
-    errmsg <- paste0("'batch_size' must be greater than 0.\n",
-                     "  'batch_size' is ", batch_size, "\n")
-    stop(errmsg, call. = FALSE)
-  }
-
-  if ( concat != TRUE & concat != FALSE ) {
-    errmsg <- paste0("'concat' must be TRUE or FALSE:\n",
-                     "  'concat' is ", concat, "\n")
-    stop(errmsg, call. = FALSE)
-  }
-
-  return(0)
-}
-
 
 is_data_vec_df_mat <- function(data, name) {
   if ( !is.vector(data) & !is.data.frame(data) & !is.matrix(data) ) {
@@ -66,8 +24,6 @@ is_data_finite <- function(data, name) {
     sum_infs <- sum(is.infinite(as.matrix(data)))
   }
 
-  #if ( any(!is.finite(data)) ) { # Does not work with data.frames :-(
-  #if ( any(is.finite(as.matrix(data))) ) {
   if ( sum_nas != 0 | sum_nans != 0 | sum_infs != 0 ) {
     errmsg <- paste0("Can't have non-finite values in '", name, "':\n")
 
@@ -114,6 +70,48 @@ is_data_all_numeric <- function(data, name) {
   return(0)
 }
 
+check_params <- function(x1, y1, alpha, concat, batch_size) {
+
+  is_data_vec_df_mat(x1, 'x1')
+  is_data_vec_df_mat(y1, 'y1')
+
+  x1.len <- get_data_length(x1)
+  y1.len <- get_data_length(y1)
+
+  if ( x1.len != y1.len ) {
+    errmsg <- paste0("'x1' and 'y1' must have compatible lengths:\n",
+                     "  'x1' has length: ", x1.len, "\n",
+                     "  'y1' has length: ", y1.len, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  is_data_all_numeric(x1, 'x1')
+  is_data_all_numeric(y1, 'y1')
+
+  is_data_finite(x1, 'x1')
+  is_data_finite(y1, 'y1')
+
+  if ( alpha < 0 ) {
+    errmsg <- paste0("'alpha' must be greater than or equal to 0.\n",
+                     "  'alpha' is ", alpha, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( !is.null(batch_size) && batch_size <= 0 ) {
+    errmsg <- paste0("'batch_size' must be greater than 0.\n",
+                     "  'batch_size' is ", batch_size, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  if ( concat != TRUE & concat != FALSE ) {
+    errmsg <- paste0("'concat' must be TRUE or FALSE:\n",
+                     "  'concat' is ", concat, "\n")
+    stop(errmsg, call. = FALSE)
+  }
+
+  return(0)
+}
+
 
 get_data_length <- function(data) {
   if ( is.vector(data) ) {
@@ -123,6 +121,68 @@ get_data_length <- function(data) {
   }
 
   return(len)
+}
+
+
+concat_data <- function(data.orig, data) {
+    if (is.vector(data.orig)) {
+      data <- c(data.orig, data)
+    } else {
+      if (is.matrix(data.orig)) {
+        data <- as.matrix(data)
+      } else if (is.data.frame(data.orig)) {
+        data <- as.data.frame(data)
+      }   
+
+	  colnames(data) <- colnames(data.orig)
+      data <- rbind(data.orig, data)
+    }
+
+    return(data)
+}
+
+
+get_randomised_data <- function(data, index) {
+  if (is.vector(data)) {
+    data.ran <- data[index]
+  } else if (is.matrix(data)) {
+    data.ran <- data[index,]
+	colnames(data.ran) <- colnames(data)
+  } else if (is.data.frame(data)) {
+    data.ran <- as.data.frame(data[index,])
+	colnames(data.ran) <- colnames(data)
+  } 
+
+  return(data.ran)
+}
+
+
+resize_data <- function(data, batch_size) {
+  data.orig <- data
+  data.len <- get_data_length(data)
+
+  if (data.len < batch_size) {
+      rep.times <- ceiling(batch_size/data.len)
+
+      if (is.vector(data)) {
+        data <- rep(data, rep.times)
+        data <- data[1:batch_size]
+      } else {
+        data <- data[rep(seq_len(nrow(data)), rep.times),]
+
+        # Fixes errors with single dimenion data frames & matrices
+        if (is.matrix(data.orig)) {
+            data <- as.matrix(data)
+        } else if (is.data.frame(data.orig)) {
+            data <- as.data.frame(data)
+        }
+
+	    colnames(data) <- colnames(data.orig)
+        data <- data[1:batch_size,]
+      }
+  }
+
+  return(data)
 }
 
 
@@ -176,101 +236,23 @@ mixup <- function(x1, y1, alpha=1, concat=FALSE, batch_size=NULL) {
     index <- sample(x1.len, batch_size)
   }
   
-  # Make x1 same size as x2 by repeating rows and similarly for y1
   x1.orig <- x1
   y1.orig <- y1
-  if (x1.len < batch_size) {
-      rep.times <- ceiling(batch_size/x1.len)
 
-      if (is.vector(x1)) {
-        x1 <- rep(x1, rep.times)
-        x1 <- x1[1:batch_size]
-      } else {
-        x1 <- x1[rep(seq_len(nrow(x1)), rep.times),]
+  # Make x1 same size as x2 by repeating/removing rows and similarly for y1
+  x1 <- resize_data(x1, batch_size)
+  y1 <- resize_data(y1, batch_size)
 
-        # Fixes errors with single dimenion data frames & matrices
-        if (is.matrix(x1.orig)) {
-            x1 <- as.matrix(x1)
-        } else if (is.data.frame(x1.orig)) {
-            x1 <- as.data.frame(x1)
-        }
-
-	    colnames(x1) <- colnames(x1.orig)
-        x1 <- x1[1:batch_size,]
-      }
-  }
-
-  if (y1.len < batch_size) {
-      rep.times <- ceiling(batch_size/y1.len)
-
-      if (is.vector(y1)) {
-        y1 <- rep(y1, rep.times)
-        y1 <- y1[1:batch_size]
-      } else {
-        y1 <- y1[rep(seq_len(nrow(y1)), rep.times),]
-
-        # Fixes errors with single dimenion data frames & matrices
-        if (is.matrix(y1.orig)) {
-            y1 <- as.matrix(y1)
-        } else if (is.data.frame(y1.orig)) {
-            y1 <- as.data.frame(y1)
-        }
-
-	    colnames(y1) <- colnames(y1.orig)
-        y1 <- y1[1:batch_size,]
-      }
-  }
-
-  if (is.vector(x1)) {
-    x2 <- x1[index]
-  } else if (is.matrix(x1)) {
-    x2 <- x1[index,]
-	colnames(x2) <- colnames(x1)
-  } else if (is.data.frame(x1)) {
-    x2 <- as.data.frame(x1[index,])
-	colnames(x2) <- colnames(x1)
-  } 
-  
-  if (is.vector(y1)) {
-    y2 <- y1[index]
-  } else if (is.matrix(y1)) {
-    y2 <- y1[index,]
-	colnames(y2) <- colnames(y1)
-  } else if (is.data.frame(y1)) {
-    y2 <- as.data.frame(y1[index,])
-	colnames(y2) <- colnames(y1)
-  }   
+  x2 <- get_randomised_data(x1, index)
+  y2 <- get_randomised_data(y1, index)
   
   lam <- rbeta(batch_size, alpha, alpha)
   x <- lam * x1 + (1. - lam) * x2
   y <- lam * y1 + (1. - lam) * y2
   
   if (concat==TRUE) {
-    if (is.vector(y1.orig)) {
-      y <- c(y1.orig, y)
-    } else {
-      if (is.matrix(y1.orig)) {
-        y <- as.matrix(y)
-      } else if (is.data.frame(y1.orig)) {
-        y <- as.data.frame(y)
-      }   
-
-	  colnames(y) <- colnames(y1.orig)
-      y <- rbind(y1.orig, y)
-    }
-
-    if (is.vector(x1.orig)) {
-      x <- c(x1.orig, x)
-    } else {
-      if (is.matrix(x1.orig)) {
-        x <- as.matrix(x)
-      } else if (is.data.frame(x1.orig)) {
-        x <- as.data.frame(x)
-      }   
-
-	  colnames(x) <- colnames(x1.orig)
-      x <- rbind(x1.orig, x)
-    }
+    x <- concat_data(x1.orig, x)
+    y <- concat_data(y1.orig, y)
   }
 
   return(list(x=x, y=y))
