@@ -70,6 +70,22 @@ is_data_all_numeric <- function(data, name) {
   return(0)
 }
 
+
+is_data_binary <- function(data, name) {
+  uniq_vals <- sort(unique(as.vector(as.matrix(data))))
+
+  if ( identical(uniq_vals, c(0, 1)) == FALSE ) {
+    uniq_vals_str <- paste(unlist(uniq_vals), collapse=' ')
+    errmsg <- paste0("'", name, "' must contain only 0 and/or 1 numeric values:\n",
+                     "  '", name, "' contains - ", uniq_vals_str, "\n")
+
+    stop(errmsg, call. = FALSE)
+  }
+
+  return(0)
+}
+
+
 check_params <- function(x1, y1, alpha, concat, batch_size) {
 
   is_data_vec_df_mat(x1, 'x1')
@@ -90,6 +106,8 @@ check_params <- function(x1, y1, alpha, concat, batch_size) {
 
   is_data_finite(x1, 'x1')
   is_data_finite(y1, 'y1')
+
+  is_data_binary(y1, 'y1')
 
   if ( alpha < 0 ) {
     errmsg <- paste0("'alpha' must be greater than or equal to 0.\n",
