@@ -76,7 +76,7 @@ is_data_binary <- function(data, name) {
 
   if ( identical(uniq_vals, c(0, 1)) == FALSE ) {
     uniq_vals_str <- paste(unlist(uniq_vals), collapse=' ')
-    errmsg <- paste0("'", name, "' must contain only 0 and/or 1 numeric values:\n",
+    errmsg <- paste0("'", name, "' must contain only numeric 0 and 1 values:\n",
                      "  '", name, "' contains - ", uniq_vals_str, "\n")
 
     stop(errmsg, call. = FALSE)
