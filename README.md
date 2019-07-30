@@ -2,7 +2,7 @@
 # mixup
 
 ![Lifecycle
-](https://img.shields.io/badge/experimental-orange.svg?style=flat)
+](https://img.shields.io/badge/lifecycle-experimental-orange.svg?style=flat)
 ![R 
 %>%= 3.2.0](https://img.shields.io/badge/R->%3D3.2.0-blue.svg?style=flat)
 ![Dependencies
@@ -139,6 +139,7 @@ I have no affiliation with MIT, FAIR or any of the authors.
      * Different data types e.g. tabular, image etc
      * Different parameters
      * Different learning methods
+ * Lint package with [goodpractice](https://cran.r-project.org/web/packages/goodpractice/index.html)
  * Add tests
  * Add support for one-hot encoded labels
  * Add label preserving option
