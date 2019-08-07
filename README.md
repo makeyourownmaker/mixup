@@ -15,7 +15,7 @@ mixup is an R package for data-augmentation inspired by
 ## Usage 
 
 Create additional training data for toy dataset:
-```
+```r
 library(mixup)
 
 # Use builtin mtcars dataset with mtcars$am (automatic/manual) as binary target
@@ -39,7 +39,7 @@ summary(mtcars.mix$y)
 
 Requires R version 3.2.0 and higher.
 
-```
+```r
 install.packages('devtools') # Install devtools package if necessary
 library(devtools)
 devtools::install_github('makeyourownmaker/mixup')
