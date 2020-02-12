@@ -11,6 +11,8 @@
 mixup is an R package for data-augmentation inspired by 
 [mixup: Beyond Empirical Risk Minimization](https://arxiv.org/abs/1710.09412)
 
+If you like mixup, give it a star, or fork it and contribute!
+
 
 ## Usage 
 
