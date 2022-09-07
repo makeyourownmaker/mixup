@@ -141,6 +141,10 @@ I have no affiliation with MIT, FAIR or any of the authors.
      * Different data types e.g. tabular, image etc
      * Different parameters
      * Different learning methods
+ * Add my time series mixup variant
+   * Applies mixup technique to two time series separated by 'time_diff' period
+   * Implemented and tested in this
+     [encoder decoder Jupyter notebook](https://github.com/makeyourownmaker/CambridgeTemperatureNotebooks/blob/main/notebooks/encoder_decoder.ipynb)
  * Lint package with [goodpractice](https://cran.r-project.org/web/packages/goodpractice/index.html)
  * Add tests
  * Add support for one-hot encoded labels
@@ -158,6 +162,7 @@ Other implementations:
  * [pytorch from facebookresearch](https://github.com/facebookresearch/mixup-cifar10)
  * [keras from yu4u](https://github.com/yu4u/mixup-generator)
  * [mxnet from unsky](https://github.com/unsky/mixup)
+ * [Python package for data augmentation inspired by Mixup: Beyond Empirical Risk Minimization](https://github.com/makeyourownmaker/mixupy)
 
 
 ## See Also
